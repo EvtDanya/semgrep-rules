@@ -5,6 +5,10 @@
     <title>SSTI DEMO</title>
   </head>
   <body>
+    <!-- True positive: preprocessing pattern with SSTI -->
     <h1 th:text="@{'/login?redirectAfterLogin=__${Referer}__'}"></h1>
+
+    <!-- True negative: normal expression without preprocessing -->
+    <h1 th:text="@{'/login?redirectAfterLogin=${Referer}'}"></h1>
   </body>
 </html>
