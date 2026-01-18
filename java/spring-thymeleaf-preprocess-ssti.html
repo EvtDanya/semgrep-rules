@@ -1,0 +1,10 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>SSTI DEMO</title>
+  </head>
+  <body>
+    <h1 th:text="@{'/login?redirectAfterLogin=__${Referer}__'}"></h1>
+  </body>
+</html>
