@@ -1,0 +1,104 @@
+rules:
+  - id: nextjs-images-wildcard-hostname
+    message: >-
+      Dangerous use of '**' in images.remotePatterns.hostname.
+      Using wildcard hostnames allows loading images from any domain, resulting in blind SSRF.
+      Recommendation:
+      - specify exact domains or use more restrictive patterns
+    languages:
+      - javascript
+      - typescript
+    severity: MEDIUM
+    patterns:
+      - pattern: |
+          {
+            hostname: "**"
+          }
+      - pattern-inside: |
+          images: {
+            remotePatterns: [
+              ...
+            ]
+          }
+      - pattern-not-inside: |
+          images: {
+            unoptimized: true,
+            ...
+          }
+    metadata:
+      category: security
+      technology:
+        - nextjs
+      subcategory:
+        - vuln
+      confidence: HIGH
+      likelihood: MEDIUM
+      impact: MEDIUM
+      cwe:
+        - "CWE-918: Server-Side Request Forgery (SSRF)"
+      owasp:
+        - "A02:2025 Security Misconfiguration"
+      references:
+        - https://www.intigriti.com/researchers/blog/hacking-tools/ssrf-vulnerabilities-in-nextjs-targets#ssrf-in-nextjs-image-component
+        - https://nextjs.org/docs/app/api-reference/components/image#remotepatterns
+        - https://nextjs.org/docs/pages/api-reference/components/image#remotepatterns
+
+  - id: nextjs-images-localhost-hostname
+    message: >-
+      Dangerous use of "localhost" or "127.0.0.1" in images.remotePatterns.hostname.
+      When Image Optimization is enabled (unoptimized: false or unset), Next.js proxies images through the server.
+      This allows attackers to request images from any local port, resulting in blind SSRF.
+      Recommendation:
+      - Never allow localhost / 127.0.0.1 in remotePatterns
+      - Use exact external domains
+      - Or disable optimization: images.unoptimized: true
+      - Or specify exact port and pathname 
+    languages:
+      - javascript
+      - typescript
+    severity: LOW
+    patterns:
+      - pattern-either:
+        - pattern: |
+            {
+              hostname: "localhost"
+            }
+        - pattern: |
+            {
+              hostname: "127.0.0.1"
+            }
+      - pattern-inside: |
+          images: {
+            remotePatterns: [
+              ...
+            ]
+          }
+      - pattern-not-inside: |
+          images: {
+            unoptimized: true,
+            ...
+          }
+      - pattern-not-inside: |
+          {
+            ...,
+            port: ...,
+            pathname: ...,
+            ...
+          }
+    metadata:
+      category: security
+      technology:
+        - nextjs
+      subcategory:
+        - vuln
+      confidence: HIGH
+      likelihood: MEDIUM
+      impact: LOW
+      cwe:
+        - "CWE-918: Server-Side Request Forgery (SSRF)"
+      owasp:
+        - "A02:2025 Security Misconfiguration"
+      references:
+        - https://www.intigriti.com/researchers/blog/hacking-tools/ssrf-vulnerabilities-in-nextjs-targets#ssrf-in-nextjs-image-component
+        - https://nextjs.org/docs/app/api-reference/components/image#remotepatterns
+        - https://nextjs.org/docs/pages/api-reference/components/image#remotepatterns
