@@ -9,22 +9,39 @@ rules:
       - javascript
       - typescript
     severity: MEDIUM
-    patterns:
-      - pattern: |
-          {
-            hostname: "**"
-          }
-      - pattern-inside: |
-          images: {
-            remotePatterns: [
+    pattern-either:
+      - patterns:
+        - pattern: |
+            {
+              hostname: "**"
+            }
+        - pattern-inside: |
+            images: {
+              remotePatterns: [
+                ...
+              ]
+            }
+        - pattern-not-inside: |
+            images: {
+              unoptimized: true,
               ...
-            ]
-          }
-      - pattern-not-inside: |
-          images: {
-            unoptimized: true,
-            ...
-          }
+            }
+      - patterns:
+        - pattern: new URL($URL)
+        - metavariable-regex:
+            metavariable: $URL
+            regex: .*\/\/\*\*.*
+        - pattern-inside: |
+            images: {
+              remotePatterns: [
+                ...
+              ]
+            }
+        - pattern-not-inside: |
+            images: {
+              unoptimized: true,
+              ...
+            }
     metadata:
       category: security
       technology:
@@ -57,34 +74,67 @@ rules:
       - javascript
       - typescript
     severity: LOW
-    patterns:
-      - pattern-either:
-        - pattern: |
-            {
-              hostname: "localhost"
+    pattern-either:
+      - patterns:
+        - pattern-either:
+          - pattern: |
+              {
+                hostname: "localhost"
+              }
+          - pattern: |
+              {
+                hostname: "127.0.0.1"
+              }
+        - pattern-inside: |
+            images: {
+              remotePatterns: [
+                ...
+              ]
             }
-        - pattern: |
-            {
-              hostname: "127.0.0.1"
-            }
-      - pattern-inside: |
-          images: {
-            remotePatterns: [
+        - pattern-not-inside: |
+            images: {
+              unoptimized: true,
               ...
-            ]
-          }
-      - pattern-not-inside: |
-          images: {
-            unoptimized: true,
-            ...
-          }
-      - pattern-not-inside: |
-          {
-            ...,
-            port: ...,
-            pathname: ...,
-            ...
-          }
+            }
+        - pattern-not-inside: |
+            {
+              ...,
+              port: ...,
+              pathname: ...,
+              ...
+            }
+      - patterns:
+        - pattern: new URL($URL)
+        - metavariable-regex:
+            metavariable: $URL
+            regex: .*\/\/localhost.*
+        - pattern-inside: |
+            images: {
+              remotePatterns: [
+                ...
+              ]
+            }
+        - pattern-not-inside: |
+            images: {
+              unoptimized: true,
+              ...
+            }
+      - patterns:
+        - pattern: new URL($URL)
+        - metavariable-regex:
+            metavariable: $URL
+            regex: .*\/\/127\.0\.0\.1.*
+        - pattern-inside: |
+            images: {
+              remotePatterns: [
+                ...
+              ]
+            }
+        - pattern-not-inside: |
+            images: {
+              unoptimized: true,
+              ...
+            }
     metadata:
       category: security
       technology:
