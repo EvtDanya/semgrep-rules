@@ -63,7 +63,7 @@ rules:
   - id: nextjs-images-localhost-hostname
     message: >-
       Dangerous use of "localhost" or "127.0.0.1" in images.remotePatterns.hostname.
-      When Image Optimization is enabled (unoptimized: false or unset), Next.js proxies images through the server.
+      When Image Optimization is enabled (unoptimized: false or unset), Next.js processing images through the server.
       This allows attackers to request images from any local port, resulting in blind SSRF.
       Recommendation:
       - Never allow localhost / 127.0.0.1 in remotePatterns

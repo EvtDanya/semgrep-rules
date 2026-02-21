@@ -14,8 +14,14 @@ rules:
       confidence: "high"
       likelihood: "medium"
       impact: "high"
+      subcategory:
+        - vuln
+      technology:
+        - spring
+        - thymeleaf
       references:
         - https://modzero.com/en/blog/spring_boot_ssti/
+        - https://www.acunetix.com/blog/web-security-zone/exploiting-ssti-in-thymeleaf/
 
     patterns:
       - pattern-regex: '[$*#@~]\{[^}]*__\$\{[^}]+\}__[^}]*\}'
