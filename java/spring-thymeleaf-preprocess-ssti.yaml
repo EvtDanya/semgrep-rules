@@ -5,7 +5,7 @@ rules:
     severity: HIGH
     message: >
       Thymeleaf template contains a double-evaluation marker (__${...}__).
-      This enables expression preprocessing and may allow Server-Side Template Injection (SSTI),
+      This enables expression preprocessing and may allow SSTI if user input is included in the expression,
       potentially leading to arbitrary code execution depending on classpath and context.
 
     metadata:

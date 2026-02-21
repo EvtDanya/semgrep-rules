@@ -1,7 +1,7 @@
-// rule-id: nextjs-images-wildcard-hostname
 const config1 = {
   images: {
     remotePatterns: [
+      // ruleid: nextjs-images-wildcard-hostname
       {
         protocol: 'https',
         hostname: '**',
@@ -11,10 +11,10 @@ const config1 = {
   },
 };
 
-// rule-id: nextjs-images-wildcard-hostname
 const config2 = {
   images: {
     remotePatterns: [
+      // ruleid: nextjs-images-wildcard-hostname
       {
         hostname: '**',
       },
@@ -22,10 +22,10 @@ const config2 = {
   },
 };
 
-// OK: Using wildcard hostname but optimization disabled (shouldnt trigger the rule)
 const config3 = {
   images: {
     remotePatterns: [
+      // ok: Using wildcard hostname but optimization disabled (shouldnt trigger the rule)
       {
         protocol: 'https',
         hostname: '**',
@@ -36,13 +36,13 @@ const config3 = {
   },
 };
 
-// OK: Using wildcard hostname but port and path specified (shouldnt trigger the rule)
 const config4 = {
   images: {
     remotePatterns: [
+      // ok: Using localhost but port and path specified (shouldnt trigger the rule)
       {
-        protocol: 'https',
-        hostname: '**',
+        protocol: 'http',
+        hostname: 'localhost',
         port: '8080',
         pathname: '/images/**',
       },
@@ -50,10 +50,10 @@ const config4 = {
   },
 };
 
-// OK: Specific domain (shouldnt trigger the rule)
 const config5 = {
   images: {
     remotePatterns: [
+      // ok: Specific domain (shouldnt trigger the rule)
       {
         protocol: 'https',
         hostname: 'example.com',
@@ -64,16 +64,17 @@ const config5 = {
   },
 };
 
-// OK: Multiple specific domains (shouldnt trigger the rule)
 const config6 = {
   images: {
     remotePatterns: [
+      // ok: Multiple specific domains (shouldnt trigger the rule)
       {
         protocol: 'https',
         hostname: 'images.example.com',
         port: '',
         pathname: '/images/**',
       },
+      // ok: Multiple specific domains (shouldnt trigger the rule)
       {
         protocol: 'https',
         hostname: 'media.example.com',
@@ -84,10 +85,10 @@ const config6 = {
   },
 };
 
-// OK: Using subdomain wildcard (shouldnt trigger the rule)
 const config7 = {
   images: {
     remotePatterns: [
+      // ok: Using subdomain wildcard (shouldnt trigger the rule)
       {
         protocol: 'https',
         hostname: '*.example.com',
@@ -98,17 +99,17 @@ const config7 = {
   },
 };
 
-// rule-id: nextjs-images-wildcard-hostname
 const config8 = {
   images: {
+    // ruleid: nextjs-images-wildcard-hostname
     remotePatterns: [new URL('https://**/images/**')],
   },
 };
 
-// rule-id: nextjs-images-localhost-hostname
 const config9 = {
   images: {
     remotePatterns: [
+      // ruleid: nextjs-images-localhost-hostname
       {
         hostname: 'localhost',
       },
@@ -116,16 +117,16 @@ const config9 = {
   },
 };
 
-// rule-id: nextjs-images-localhost-hostname
 const config10 = {
   images: {
+    // ruleid: nextjs-images-localhost-hostname
     remotePatterns: [new URL('http://localhost')],
   },
 };
 
-// rule-id: nextjs-images-localhost-hostname
 const config11 = {
   images: {
+    // ruleid: nextjs-images-localhost-hostname
     remotePatterns: [new URL('http://127.0.0.1')],
   },
 };

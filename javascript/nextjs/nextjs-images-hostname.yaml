@@ -4,7 +4,7 @@ rules:
       Dangerous use of '**' in images.remotePatterns.hostname.
       Using wildcard hostnames allows loading images from any domain, resulting in blind SSRF.
       Recommendation:
-      - specify exact domains or use more restrictive patterns
+      - Specify exact domains or use more restrictive patterns
     languages:
       - javascript
       - typescript

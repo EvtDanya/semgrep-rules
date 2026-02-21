@@ -42,12 +42,12 @@ jobs:
           semgrep validate ${{ steps.changed.outputs.files }} 2>&1 | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Run tests
-        if: steps.changed.outputs.files != ''
+        shell: bash
         run: |
+          set -o pipefail
           echo "## Tests" >> $GITHUB_STEP_SUMMARY
           semgrep --test \
             --exclude ".github" \
-            --exclude "*.test.yaml" \
             . 2>&1 | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Comment PR
