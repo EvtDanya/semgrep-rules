@@ -1,4 +1,4 @@
-// TP: Using wildcard hostname
+// rule-id: nextjs-images-wildcard-hostname
 const config1 = {
   images: {
     remotePatterns: [
@@ -11,7 +11,7 @@ const config1 = {
   },
 };
 
-// TP: Using wildcard hostname
+// rule-id: nextjs-images-wildcard-hostname
 const config2 = {
   images: {
     remotePatterns: [
@@ -32,7 +32,7 @@ const config3 = {
         pathname: '/images/**',
       },
     ],
-    unoptimized: false
+    unoptimized: true
   },
 };
 
@@ -98,14 +98,14 @@ const config7 = {
   },
 };
 
-// TP: Using wildcard hostname
+// rule-id: nextjs-images-wildcard-hostname
 const config8 = {
   images: {
     remotePatterns: [new URL('https://**/images/**')],
   },
 };
 
-// TP: Using localhost
+// rule-id: nextjs-images-localhost-hostname
 const config9 = {
   images: {
     remotePatterns: [
@@ -116,14 +116,14 @@ const config9 = {
   },
 };
 
-// TP: Using localhost
+// rule-id: nextjs-images-localhost-hostname
 const config10 = {
   images: {
     remotePatterns: [new URL('http://localhost')],
   },
 };
 
-// TP: Using localhost
+// rule-id: nextjs-images-localhost-hostname
 const config11 = {
   images: {
     remotePatterns: [new URL('http://127.0.0.1')],

@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # нужно для git diff
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -23,7 +23,6 @@ jobs:
       - name: Install semgrep
         run: pip3 install semgrep
 
-      # Находим изменённые .yaml файлы правил (не тест-файлы)
       - name: Get changed rule files
         id: changed
         run: |

@@ -69,7 +69,7 @@ rules:
       - Never allow localhost / 127.0.0.1 in remotePatterns
       - Use exact external domains
       - Or disable optimization: images.unoptimized: true
-      - Or specify exact port and pathname 
+      - Or specify exact port and pathname
     languages:
       - javascript
       - typescript

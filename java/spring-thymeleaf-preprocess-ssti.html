@@ -5,7 +5,7 @@
     <title>SSTI DEMO</title>
   </head>
   <body>
-    <!-- True positive: preprocessing pattern with SSTI -->
+    <!-- rule-id: spring-thymeleaf-preprocess-ssti -->
     <h1 th:text="@{'/login?redirectAfterLogin=__${Referer}__'}"></h1>
 
     <!-- True negative: normal expression without preprocessing -->
