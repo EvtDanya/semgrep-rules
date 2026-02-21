@@ -1,0 +1,70 @@
+name: Validate Semgrep Rules
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # нужно для git diff
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install semgrep
+        run: pip3 install semgrep
+
+      # Находим изменённые .yaml файлы правил (не тест-файлы)
+      - name: Get changed rule files
+        id: changed
+        run: |
+          CHANGED=$(git diff --name-only --diff-filter=ACMRT \
+            origin/${{ github.base_ref }} ${{ github.sha }} \
+            | grep -E "\.ya?ml$" \
+            | grep -v "\.test\.ya?ml$" \
+            | grep -v "^\.github/" \
+            | tr '\n' ' ')
+          echo "files=$CHANGED" >> $GITHUB_OUTPUT
+          echo "Changed rule files: $CHANGED"
+
+      - name: Validate rules
+        if: steps.changed.outputs.files != ''
+        run: |
+          echo "## Validation" >> $GITHUB_STEP_SUMMARY
+          semgrep validate ${{ steps.changed.outputs.files }} 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+
+      - name: Run tests
+        if: steps.changed.outputs.files != ''
+        run: |
+          echo "## Tests" >> $GITHUB_STEP_SUMMARY
+          semgrep --test \
+            --exclude ".github" \
+            --exclude "*.test.yaml" \
+            . 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+
+      - name: Comment PR
+        if: always() && steps.changed.outputs.files != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const validate = '${{ job.status }}';
+            const body = validate === 'success'
+              ? '✅ Semgrep validate + test passed'
+              : '❌ Semgrep checks failed — see Summary tab for details';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
