@@ -8,13 +8,11 @@ on:
 jobs:
   validate-and-test:
     runs-on: ubuntu-22.04
-    permissions:
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # нужно для git diff
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -23,7 +21,6 @@ jobs:
       - name: Install semgrep
         run: pip3 install semgrep
 
-      # Находим изменённые .yaml файлы правил (не тест-файлы)
       - name: Get changed rule files
         id: changed
         run: |
@@ -44,27 +41,10 @@ jobs:
 
       - name: Run tests
         if: steps.changed.outputs.files != ''
+        shell: bash
         run: |
+          set -o pipefail
           echo "## Tests" >> $GITHUB_STEP_SUMMARY
           semgrep --test \
             --exclude ".github" \
-            --exclude "*.test.yaml" \
             . 2>&1 | tee -a $GITHUB_STEP_SUMMARY
-
-      - name: Comment PR
-        if: always() && steps.changed.outputs.files != ''
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { execSync } = require('child_process');
-            const validate = '${{ job.status }}';
-            const body = validate === 'success'
-              ? '✅ Semgrep validate + test passed'
-              : '❌ Semgrep checks failed — see Summary tab for details';
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body
-            });
