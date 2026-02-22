@@ -40,7 +40,7 @@ jobs:
           OUTPUT=$(semgrep validate ${{ steps.changed.outputs.files }} 2>&1) || true
           echo "$OUTPUT" | tee -a $GITHUB_STEP_SUMMARY
           if echo "$OUTPUT" | grep -qiE "(warning|invalid rule|skippable error|unknown field)"; then
-            echo "[ERR] Validation found warnings or errors" | tee -a $GITHUB_STEP_SUMMARY
+            echo "Validation found warnings or errors" | tee -a $GITHUB_STEP_SUMMARY
             exit 1
           fi
           echo "[INFO] Validation passed" | tee -a $GITHUB_STEP_SUMMARY
