@@ -20,15 +20,6 @@ jobs:
 
       - name: Install semgrep + deps
         run: pip3 install semgrep jsonschema pyyaml
-        
-      - name: Validate metadata
-        if: steps.changed.outputs.files != ''
-        run: |
-          set -o pipefail
-          echo "## Metadata Validation" >> $GITHUB_STEP_SUMMARY
-          python3 .github/scripts/validate-metadata.py \
-            --schema .github/metadata-schema.yaml.schm \
-            --config ${{ steps.changed.outputs.files }} 2>&1 | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Get changed rule files
         id: changed
@@ -45,8 +36,23 @@ jobs:
       - name: Validate rules
         if: steps.changed.outputs.files != ''
         run: |
+          set -o pipefail
           echo "## Validation" >> $GITHUB_STEP_SUMMARY
-          semgrep validate ${{ steps.changed.outputs.files }} 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+          OUTPUT=$(semgrep validate ${{ steps.changed.outputs.files }} 2>&1)
+          echo "$OUTPUT" | tee -a $GITHUB_STEP_SUMMARY
+          if echo "$OUTPUT" | grep -qiE "(warning|invalid rule|skippable error|unknown field)"; then
+            echo "[ERR] Validation found warnings or errors" | tee -a $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Validate metadata
+        if: steps.changed.outputs.files != ''
+        run: |
+          set -o pipefail
+          echo "## Metadata Validation" >> $GITHUB_STEP_SUMMARY
+          python3 .github/scripts/validate-metadata.py \
+            --schema .github/metadata-schema.yaml.schm \
+            --config ${{ steps.changed.outputs.files }} 2>&1 | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Run tests
         if: steps.changed.outputs.files != ''
