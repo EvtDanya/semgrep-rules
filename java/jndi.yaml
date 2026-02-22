@@ -1,0 +1,58 @@
+rules:
+  - id: jndi-injection-comprehensive
+    message: |
+      JNDI injection vulnerability detected. Multiple attack vectors possible:
+      — Remote class loading (if trustURLCodebase=true)
+      — BeanFactory exploitation via ResourceRef
+      — EL injection through ObjectFactory
+    severity: ERROR
+    languages: [java]
+    mode: taint
+    pattern-sources:
+      - patterns:
+        - pattern-either:
+          - pattern: $REQ.getParameter($PARAM)
+          - pattern: $REQ.getHeader($HEADER)
+          - pattern: $REQ.getAttribute($ATTR)
+          - pattern: |
+              @RequestParam $TYPE $VAR
+          - pattern: |
+              @PathVariable $TYPE $VAR
+          - pattern: $COOKIE.getValue()
+    pattern-sinks:
+      - patterns:
+        - pattern-either:
+          - pattern: $CTX.lookup($TAINTED)
+          - pattern: new InitialContext().lookup($TAINTED)
+          - pattern: new InitialContext($PROPS).lookup($TAINTED)
+          - pattern: ContextFactory.getInitialContext(...).lookup($TAINTED)
+          - pattern: $LDAP.lookup($TAINTED)
+          - pattern: $DIR_CTX.lookup($TAINTED)
+    pattern-sanitizers:
+      - pattern: validateJNDIName($INPUT)
+      - pattern: $WHITELIST.contains($INPUT)
+      - pattern: sanitizeNamingInput($INPUT)
+    metadata:
+      cwe:
+        - "CWE-074: Improper Neutralization of Special Elements"
+        - "CWE-470: Use of Externally-Controlled Input to Select Classes"
+      owasp: "A03:2021 - Injection"
+      impact: "CRITICAL"
+      likelihood: "HIGH"
+
+  - id: jndi-remote-codebase-config
+    message: |
+      Обнаружена опасная конфигурация JNDI. Включено доверие к удаленному codebase,
+      что позволяет атаки удаленной загрузки классов.
+    severity: ERROR
+    languages: [java]
+    patterns:
+      - pattern-either:
+        - pattern: |
+            $PROPS.setProperty("com.sun.jndi.ldap.object.trustURLCodebase", "true")
+        - pattern: |
+            $PROPS.setProperty("com.sun.jndi.rmi.object.trustURLCodebase", "true")
+        - pattern: |
+            System.setProperty("com.sun.jndi.ldap.object.trustURLCodebase", "true")
+    fix: |
+      $PROPS.setProperty("com.sun.jndi.ldap.object.trustURLCodebase", "false")

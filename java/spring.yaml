@@ -1,0 +1,33 @@
+rules:
+  - id: spring-security-bypass-patterns
+    message: |
+      Potential Spring Security bypass through direct servlet access or RequestDispatcher forwarding.
+    severity: MEDIUM
+    languages: [java]
+    patterns:
+      - pattern-either:
+        - pattern: |
+            $REQ.getRequestDispatcher($PATH).forward($REQ, $RESP)
+        - pattern: |
+            @RequestMapping(value = "/**")
+        - pattern-inside: |
+            @Controller
+            class $CLASS { ... }
+
+  - id: sensitive-data-in-logs
+    message: |
+     Sensitive data logged without sanitization. May expose credentials or personal information in log files.
+    severity: MEDIUM
+    languages: [java]
+    mode: taint
+    pattern-sources:
+      - patterns:
+        - pattern: $REQ.getParameter("password")
+        - pattern: $REQ.getParameter("token")
+        - pattern: $REQ.getParameter("apikey")
+        - pattern: $REQ.getHeader("Authorization")
+    pattern-sinks:
+      - patterns:
+        - pattern: $LOG.info($TAINTED)
+        - pattern: $LOG.debug($TAINTED)
+        - pattern: System.out.println($TAINTED)

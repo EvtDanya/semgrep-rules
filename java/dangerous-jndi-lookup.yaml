@@ -1,0 +1,32 @@
+rules:
+  - id: dangerous-jndi-lookup
+    message: |
+      Potential JNDI injection vulnerability detected. User-controlled input is being used in a JNDI lookup without proper validation.
+    severity: ERROR
+    languages: [java]
+    mode: taint
+    pattern-sources:
+      - patterns:
+          - pattern-either:
+              - pattern: $REQ.getParameter($PARAM)
+              - pattern: $REQ.getHeader($HEADER)
+              - pattern: $INPUT.readLine()
+      - patterns:
+        - pattern: |
+            @RequestParam $TYPE $VAR
+        focus-metavariable: $VAR
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: $CTX.lookup($TAINTED)
+              - pattern: new InitialContext().lookup($TAINTED)
+              - pattern: ContextFactory.getInitialContext(...).lookup($TAINTED)
+              - pattern: $LDAP.lookup($TAINTED)
+    pattern-sanitizers:
+      - pattern: validateJNDIName($INPUT)
+      - pattern: $WHITELIST.contains($INPUT)
+    metadata:
+      cwe: "CWE-074: Improper Neutralization of Special Elements in Output Used by a Downstream Component"
+      owasp: "A03:2021 - Injection"
+      references:
+        - "https://www.blackhat.com/docs/us-16/materials/us-16-Munoz-A-Journey-From-JNDI-LDAP-Manipulation-To-RCE.pdf"

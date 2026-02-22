@@ -1,0 +1,30 @@
+rules:
+- id: unsafe-java-deserialization
+  message: |
+    Unsafe Java deserialization detected. This can lead to remote code execution if attacker-controlled data is deserialized.
+  severity: ERROR
+  languages: [java]
+  mode: taint
+  pattern-sources:
+    - patterns:
+      - pattern-either:
+        - pattern: $REQ.getInputStream()
+        - pattern: $SOCKET.getInputStream()
+        - pattern: new FileInputStream($FILE)
+        - pattern: $REQ.getParameter($PARAM)
+  pattern-sinks:
+    - patterns:
+      - pattern-either:
+        - pattern: $OIS.readObject()
+        - pattern: new ObjectInputStream($INPUT).readObject()
+        - pattern: $DECODER.readObject()
+        - pattern: XMLDecoder.readObject()
+  pattern-sanitizers:
+    - pattern: new ValidatingObjectInputStream($INPUT)
+    - pattern: $VALIDATOR.validate($INPUT)
+  metadata:
+    cwe: "CWE-502: Deserialization of Untrusted Data"
+    owasp: "A08:2021 - Software and Data Integrity Failures"
+  references:
+    - "https://github.com/frohoff/ysoserial"
+    - "https://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability"
