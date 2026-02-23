@@ -1,0 +1,25 @@
+rules:
+- id: mysql-jdbc-autodeserialize
+  message: |
+   Dangerous MySQL JDBC configuration with autoDeserialize=true. Vulnerable to deserialization attacks via rogue MySQL servers.
+  severity: HIGH
+  languages: [java]
+  patterns:
+    - pattern: DriverManager.getConnection($URL, ...)
+    - metavariable-regex:
+        metavariable: $URL
+        regex: '.*autoDeserialize=true.*'
+  metadata:
+    cwe: "CWE-502: Deserialization of Untrusted Data"
+    owasp: "A08:2025 - Software and Data Integrity Failures"
+    impact: HIGH
+    likelihood: MEDIUM
+    category: security
+    subcategory: 
+      - vuln
+    technology: 
+      - java
+      - mysql
+    references:
+      - "https://book.hacktricks.wiki/en/network-services-pentesting/pentesting-mysql.html#rogue--fake-mysql-server-attacks-against-jdbc-clients"
+      - "https://www.cve.news/cve-2023-22102/"

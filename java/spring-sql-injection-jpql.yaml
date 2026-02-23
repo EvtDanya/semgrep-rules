@@ -1,0 +1,71 @@
+rules:
+- id: spring-sql-injection-jpql
+  message: |
+    SQL injection vulnerability in JPQL query construction. User input is directly concatenated into database queries.
+  severity: ERROR
+  languages: [java]
+  mode: taint
+  pattern-sources:
+    - pattern-either:
+      - pattern: $REQ.getParameter($PARAM)
+      - pattern: $REQ.getHeader($HEADER)
+      - pattern: $REQ.getAttribute($ATTR)
+      - pattern: $REQ.getPathVariable($VAR)
+      - pattern: $INPUT.readLine()
+      - pattern: $COOKIE.getValue()
+      - pattern: |
+          @RequestParam $TYPE $VAR
+      - pattern: |
+          @PathVariable $TYPE $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam($VALUE) $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam(value=$VALUE) $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., $TYPE $VAR, ...) {
+              ...
+            }
+        - pattern: $VAR
+        - focus-metavariable: $VAR
+  pattern-sinks:
+    - patterns:
+      - pattern-either:
+        - pattern: $EM.createQuery($TAINTED)
+        - pattern: $EM.createQuery($TAINTED, ...)
+        - pattern: $JDBC.queryForList($TAINTED)
+        - pattern: $JDBC.queryForList($TAINTED, ...)
+        - pattern: $JDBC.execute($TAINTED)
+        - pattern: $JDBC.query($TAINTED, ...)
+  pattern-sanitizers:
+    - pattern: $VALIDATOR.validateSQLInput($INPUT)
+    - pattern: $WHITELIST.contains($INPUT)
+  metadata:
+    cwe: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+    owasp: "A05:2025 - Injection"
+    impact: HIGH
+    likelihood: HIGH
+    category: security
+    subcategory: 
+      - vuln
+    technology: 
+      - java
+      - spring
+      - jpa
+    references:
+      - "https://www.owasp.org/index.php/Testing_for_SQL_Injection_(OTG-INPVAL-005)"
+      - "https://www.baeldung.com/spring-data-jpa-query"

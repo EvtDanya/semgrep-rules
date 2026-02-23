@@ -1,0 +1,31 @@
+rules:  
+  - id: jndi-remote-codebase-config
+    message: |
+      Dangerous JNDI configuration detected. Remote codebase trust is enabled, which allows remote class loading and can lead to JNDI injection.
+      Disable remote codebase trust by setting this property to false.
+    severity: HIGH
+    languages: [java]
+    patterns:
+      - pattern-either:
+        - pattern: |
+            $PROPS.setProperty("com.sun.jndi.ldap.object.trustURLCodebase", "true")
+        - pattern: |
+            $PROPS.setProperty("com.sun.jndi.rmi.object.trustURLCodebase", "true")
+        - pattern: |
+            System.setProperty("com.sun.jndi.ldap.object.trustURLCodebase", "true")
+        - pattern: |
+            System.setProperty("com.sun.jndi.rmi.object.trustURLCodebase", "true")
+    metadata:
+      cwe: "CWE-470: Use of Externally-Controlled Input to Select Classes or Code ('Unsafe Reflection')"
+      owasp: "A03:2021 - Injection"
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      subcategory:
+        - vuln
+      technology: 
+        - java
+        - spring
+      references:
+        - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44228
+        - https://www.blackhat.com/docs/us-16/materials/us-16-Munoz-A-Journey-From-JNDI-LDAP-Manipulation-To-RCE.pdf

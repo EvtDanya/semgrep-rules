@@ -1,0 +1,89 @@
+rules:
+- id: freemarker-ssti-vulnerability
+  message: |
+    Server-Side Template Injection (SSTI) vulnerability in FreeMarker.
+  severity: HIGH
+  languages: [java]
+  mode: taint
+  pattern-sources:
+    - pattern-either:
+      - pattern: $REQ.getParameter($PARAM)
+      - pattern: $REQ.getHeader($HEADER)
+      - pattern: $REQ.getAttribute($ATTR)
+      - pattern: $REQ.getPathVariable($VAR)
+      - pattern: $INPUT.readLine()
+      - pattern: $COOKIE.getValue()
+      - pattern: |
+          @RequestParam $TYPE $VAR
+      - pattern: |
+          @PathVariable $TYPE $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam($VALUE) $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam(value=$VALUE) $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
+  pattern-sinks:
+    - patterns:
+        - pattern-either:
+            - pattern: $MODEL.addAttribute($KEY, $TAINTED)
+            - pattern: $MODEL.put($KEY, $TAINTED)
+            - pattern: new $TEMPLATE($TAINTED)
+  pattern-sanitizers:
+    - pattern: sanitizeTemplateInput($INPUT)
+    - pattern: escapeTemplateSpecialChars($INPUT)
+    - pattern: $WHITELIST.contains($INPUT)
+  metadata:
+    cwe: "CWE-094: Improper Control of Generation of Code ('Code Injection')"
+    owasp: "A05:2025 - Injection"
+    impact: HIGH
+    likelihood: MEDIUM
+    category: security
+    subcategory: 
+      - vuln
+    technology: 
+      - java
+      - freemarker
+    references:
+      - "https://book.hacktricks.wiki/en/pentesting-web/ssti-server-side-template-injection/index.html#freemarker-java"
+
+- id: template-object-constructor-access
+  message: |
+    Dangerous FreeMarker template with ObjectConstructor access.
+  severity: HIGH
+  languages: [java]
+  patterns:
+    - pattern-either:
+        - pattern: |
+            freemarker.template.utility.ObjectConstructor
+        - pattern: |
+            new freemarker.template.utility.ObjectConstructor(...)
+        - pattern: |
+            TemplateClassResolver.SAFER_RESOLVER
+    - pattern-not: |
+        $CONFIG.setClassResolver(TemplateClassResolver.ALLOWS_NOTHING_RESOLVER)
+  metadata:
+    cwe: "CWE-470: Use of Externally-Controlled Input to Select Classes or Code ('Unsafe Reflection')"
+    owasp: "A05:2025 - Injection"
+    impact: HIGH
+    likelihood: MEDIUM
+    category: security
+    subcategory: 
+      - vuln
+    technology: 
+      - java
+      - freemarker
+    references:
+      - "https://book.hacktricks.wiki/en/pentesting-web/ssti-server-side-template-injection/index.html#freemarker-java"
