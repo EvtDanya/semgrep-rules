@@ -15,7 +15,11 @@ rules:
     impact: HIGH
     likelihood: MEDIUM
     category: security
-    subcategory: vuln
+    subcategory: 
+      - vuln
     technology: 
       - java
       - mysql
+    references:
+      - "https://book.hacktricks.wiki/en/network-services-pentesting/pentesting-mysql.html#rogue--fake-mysql-server-attacks-against-jdbc-clients"
+      - "https://www.cve.news/cve-2023-22102/"

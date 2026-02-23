@@ -70,7 +70,8 @@ rules:
     impact: HIGH
     likelihood: MEDIUM
     category: security
-    subcategory: vuln
+    subcategory: 
+      - vuln
     technology: 
       - java
       - freemarker

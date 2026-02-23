@@ -21,10 +21,11 @@ rules:
       impact: HIGH
       likelihood: HIGH
       category: security
-      subcategory: vuln
+      subcategory:
+        - vuln
       technology: 
-      - java
-      - spring
+        - java
+        - spring
       references:
         - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44228
         - https://www.blackhat.com/docs/us-16/materials/us-16-Munoz-A-Journey-From-JNDI-LDAP-Manipulation-To-RCE.pdf

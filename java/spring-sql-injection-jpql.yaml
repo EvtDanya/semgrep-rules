@@ -60,7 +60,8 @@ rules:
     impact: HIGH
     likelihood: HIGH
     category: security
-    subcategory: vuln
+    subcategory: 
+      - vuln
     technology: 
       - java
       - spring

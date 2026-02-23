@@ -61,9 +61,10 @@ rules:
       impact: HIGH
       likelihood: HIGH
       category: security
-      subcategory: vuln
-      technology: 
-      - java
-      - spring
+      subcategory: 
+        - vuln
+      technology:
+        - java
+        - spring
       references:
         - "https://www.blackhat.com/docs/us-16/materials/us-16-Munoz-A-Journey-From-JNDI-LDAP-Manipulation-To-RCE.pdf"
