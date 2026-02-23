@@ -58,7 +58,12 @@ rules:
         - "CWE-074: Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')"
         - "CWE-470: Use of Externally-Controlled Input to Select Classes or Code ('Unsafe Reflection')"
       owasp: "A05:2025 - Injection"
-      impact: "CRITICAL"
-      likelihood: "HIGH"
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      subcategory: vuln
+      technology: 
+      - java
+      - spring
       references:
         - "https://www.blackhat.com/docs/us-16/materials/us-16-Munoz-A-Journey-From-JNDI-LDAP-Manipulation-To-RCE.pdf"

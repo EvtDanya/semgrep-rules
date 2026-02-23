@@ -66,5 +66,12 @@ rules:
   metadata:
     cwe: "CWE-094: Improper Control of Generation of Code ('Code Injection')"
     owasp: "A05:2025 - Injection"
+    impact: HIGH
+    likelihood: MEDIUM
+    category: security
+    subcategory: vuln
+    technology: 
+      - java
+      - spring
     references:
       - "https://www.exploit-db.com/docs/english/48303-remote-code-execution-with-el-injection-vulnerabilities.pdf"

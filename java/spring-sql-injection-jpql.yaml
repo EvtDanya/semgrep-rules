@@ -54,3 +54,17 @@ rules:
   pattern-sanitizers:
     - pattern: $VALIDATOR.validateSQLInput($INPUT)
     - pattern: $WHITELIST.contains($INPUT)
+  metadata:
+    cwe: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+    owasp: "A05:2025 - Injection"
+    impact: HIGH
+    likelihood: HIGH
+    category: security
+    subcategory: vuln
+    technology: 
+      - java
+      - spring
+      - jpa
+    references:
+      - "https://www.owasp.org/index.php/Testing_for_SQL_Injection_(OTG-INPVAL-005)"
+      - "https://www.baeldung.com/spring-data-jpa-query"

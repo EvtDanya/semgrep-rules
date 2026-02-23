@@ -18,7 +18,13 @@ rules:
     metadata:
       cwe: "CWE-470: Use of Externally-Controlled Input to Select Classes or Code ('Unsafe Reflection')"
       owasp: "A03:2021 - Injection"
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      subcategory: vuln
+      technology: 
+      - java
+      - spring
       references:
         - https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44228
         - https://www.blackhat.com/docs/us-16/materials/us-16-Munoz-A-Journey-From-JNDI-LDAP-Manipulation-To-RCE.pdf
-      category: security

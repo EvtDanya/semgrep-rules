@@ -67,3 +67,10 @@ rules:
   metadata:
     cwe: "CWE-470: Use of Externally-Controlled Input to Select Classes or Code ('Unsafe Reflection')"
     owasp: "A05:2025 - Injection"
+    impact: HIGH
+    likelihood: MEDIUM
+    category: security
+    subcategory: vuln
+    technology: 
+      - java
+      - freemarker
