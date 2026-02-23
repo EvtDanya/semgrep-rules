@@ -48,6 +48,16 @@ rules:
   metadata:
     cwe: "CWE-094: Improper Control of Generation of Code ('Code Injection')"
     owasp: "A05:2025 - Injection"
+    impact: HIGH
+    likelihood: MEDIUM
+    category: security
+    subcategory: 
+      - vuln
+    technology: 
+      - java
+      - freemarker
+    references:
+      - "https://book.hacktricks.wiki/en/pentesting-web/ssti-server-side-template-injection/index.html#freemarker-java"
 
 - id: template-object-constructor-access
   message: |
@@ -75,3 +85,5 @@ rules:
     technology: 
       - java
       - freemarker
+    references:
+      - "https://book.hacktricks.wiki/en/pentesting-web/ssti-server-side-template-injection/index.html#freemarker-java"
