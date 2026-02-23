@@ -55,6 +55,6 @@ rules:
   metadata:
     cwe: "CWE-502: Deserialization of Untrusted Data"
     owasp: "A08:2025 - Software and Data Integrity Failures"
-  references:
-    - "https://github.com/frohoff/ysoserial"
-    - "https://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability"
+    references:
+      - "https://github.com/frohoff/ysoserial"
+      - "https://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability"

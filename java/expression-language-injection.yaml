@@ -66,5 +66,5 @@ rules:
   metadata:
     cwe: "CWE-094: Improper Control of Generation of Code ('Code Injection')"
     owasp: "A05:2025 - Injection"
-  references:
-    - "https://www.exploit-db.com/docs/english/48303-remote-code-execution-with-el-injection-vulnerabilities.pdf"
+    references:
+      - "https://www.exploit-db.com/docs/english/48303-remote-code-execution-with-el-injection-vulnerabilities.pdf"
