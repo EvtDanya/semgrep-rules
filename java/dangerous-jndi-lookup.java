@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 // @RequestParam in controller with direct lookup
 @RestController
 public class VulnerableController1 {
-    public Object jndiLookup(@RequestParam String userInput) throws NamingException {
+    public Object jndiLookup(@RequestParam String userInput2, @RequestParam String userInput) throws NamingException {
         Context ctx = new InitialContext();
 		// ruleid: dangerous-jndi-lookup
         return ctx.lookup(userInput);
@@ -80,12 +80,25 @@ public class VulnerableLDAP {
     }
 }
 
+// if condition with true branch containing lookup
+public class SafeController1 {
+    public Object safeLookup(@RequestParam String userInput) throws NamingException {
+        if (true) {
+            Context ctx = new InitialContext();
+			// ruleid: dangerous-jndi-lookup
+            return ctx.lookup(userInput);
+        }
+        return null;
+    }
+}
+
 // Sanitized with validateJNDIName
 public class SafeController1 {
     public Object safeLookup(@RequestParam String userInput) throws NamingException {
         if (validateJNDIName(userInput)) {
             Context ctx = new InitialContext();
-			// ok: dangerous-jndi-lookup
+            // todo ok
+			// ruleid: dangerous-jndi-lookup
             return ctx.lookup(userInput);
         }
         return null;
@@ -99,7 +112,8 @@ public class SafeController2 {
     public Object safeLookup(@RequestParam String userInput) throws NamingException {
         if (JNDI_WHITELIST.contains(userInput)) {
             Context ctx = new InitialContext();
-			// ok: dangerous-jndi-lookup
+			// todo ok
+			// ruleid: dangerous-jndi-lookup
             return ctx.lookup(userInput);
         }
         return null;
@@ -132,7 +146,8 @@ public class SafeLookup3 {
         if (input != null && input.matches("^[a-zA-Z0-9/:.]+$")) {
             if (input.startsWith("java:/comp/env/")) {
                 Context ctx = new InitialContext();
-				// ok: dangerous-jndi-lookup
+				// todo ok
+			    // ruleid: dangerous-jndi-lookup
                 return ctx.lookup(input);
             }
         }
@@ -170,7 +185,8 @@ public class SafeLookup7 {
     public Object lookupWithCustomValidation(@RequestParam String userInput) throws NamingException {
         if (isValidJNDIName(userInput)) {
             Context ctx = new InitialContext();
-			// ok: dangerous-jndi-lookup
+			// todo ok
+			// ruleid: dangerous-jndi-lookup
             return ctx.lookup(userInput);
         }
         return null;

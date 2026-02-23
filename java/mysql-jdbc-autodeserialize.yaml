@@ -1,0 +1,11 @@
+rules:
+- id: mysql-jdbc-autodeserialize
+  message: |
+   Dangerous MySQL JDBC configuration with autoDeserialize=true. Vulnerable to deserialization attacks via rogue MySQL servers.
+  severity: HIGH
+  languages: [java]
+  patterns:
+    - pattern: DriverManager.getConnection($URL, ...)
+    - metavariable-regex:
+        metavariable: $URL
+        regex: '.*autoDeserialize=true.*'

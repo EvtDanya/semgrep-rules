@@ -6,30 +6,65 @@ rules:
   languages: [java]
   mode: taint
   pattern-sources:
-    - patterns:
-      - pattern-either:
-        - pattern: $REQ.getParameter($PARAM)
-        - pattern: $REQ.getHeader($HEADER)
-        - pattern: |
-            @RequestParam $TYPE $VAR
-        - pattern: |
-            @PathVariable $TYPE $VAR
+    - pattern-either:
+      - pattern: $REQ.getParameter($PARAM)
+      - pattern: $REQ.getHeader($HEADER)
+      - pattern: $REQ.getAttribute($ATTR)
+      - pattern: $REQ.getPathVariable($VAR)
+      - pattern: $INPUT.readLine()
+      - pattern: $COOKIE.getValue()
+      - pattern: |
+          @RequestParam $TYPE $VAR
+      - pattern: |
+          @PathVariable $TYPE $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam($VALUE) $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam(value=$VALUE) $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
   pattern-sinks:
     - patterns:
       - pattern-either:
+        # Spring EL
+        - pattern: $PARSER.parseExpression($TAINTED)
+        - pattern: $REQ.getExpressionParser().parseExpression($TAINTED)
+        - pattern: $EXPRESSION = new SpelExpressionParser().parseExpression($TAINTED)
+
+        # JSF EL
+        - pattern: $APP.evaluateExpressionGet($CTX, "#{" + $TAINTED + "}", ...)
+        - pattern: $CTX.getApplication().evaluateExpressionGet($CTX, "#{" + $TAINTED + "}", ...)
+        - pattern: $CTX.getApplication().evaluateExpressionGet($CTX, "${" + $TAINTED + "}", ...)
+
+        # JSP EL
         - pattern: $CTX.evaluateExpressionGet($TAINTED, ...)
-        - pattern: $PROCESSOR.eval($TAINTED)
         - pattern: ExpressionFactory.createValueExpression($TAINTED, ...)
+        - pattern: $EXPRESSION_FACTORY.createValueExpression($TAINTED, ...)
+        - pattern: $EXPRESSION_FACTORY.createMethodExpression($CTX,$INPUT,...)
+
+        # General EL patterns
+        - pattern: $PROCESSOR.eval($TAINTED)
         - pattern: |
             "#{" + $TAINTED + "}"
         - pattern: |
             "${" + $TAINTED + "}"
-        - pattern: $PARSER.parseExpression($TAINTED)
   pattern-sanitizers:
     - pattern: sanitizeELExpression($INPUT)
     - pattern: escapeELSpecialChars($INPUT)
   metadata:
-    cwe: "CWE-094: Improper Control of Generation of Code"
-    owasp: "A03:2021 - Injection"
+    cwe: "CWE-094: Improper Control of Generation of Code ('Code Injection')"
+    owasp: "A05:2025 - Injection"
   references:
     - "https://www.exploit-db.com/docs/english/48303-remote-code-execution-with-el-injection-vulnerabilities.pdf"

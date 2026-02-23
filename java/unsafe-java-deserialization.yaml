@@ -2,7 +2,7 @@ rules:
 - id: unsafe-java-deserialization
   message: |
     Unsafe Java deserialization detected. This can lead to remote code execution if attacker-controlled data is deserialized.
-  severity: ERROR
+  severity: HIGH
   languages: [java]
   mode: taint
   pattern-sources:
@@ -10,8 +10,35 @@ rules:
       - pattern-either:
         - pattern: $REQ.getInputStream()
         - pattern: $SOCKET.getInputStream()
-        - pattern: new FileInputStream($FILE)
+        # - pattern: new FileInputStream($FILE)
         - pattern: $REQ.getParameter($PARAM)
+        - pattern: $REQ.getHeader($HEADER)
+        - pattern: $REQ.getAttribute($ATTR)
+        - pattern: $REQ.getPathVariable($VAR)
+        - pattern: $INPUT.readLine()
+        - pattern: $COOKIE.getValue()
+        - pattern: |
+            @RequestParam $TYPE $VAR
+        - pattern: |
+            @PathVariable $TYPE $VAR
+        - patterns:
+          - pattern-inside: |
+              $RET $METHOD(..., @RequestParam $TYPE $VAR, ...) {
+                ...
+              }
+          - focus-metavariable: $VAR
+        - patterns:
+          - pattern-inside: |
+              $RET $METHOD(..., @RequestParam($VALUE) $TYPE $VAR, ...) {
+                ...
+              }
+          - focus-metavariable: $VAR
+        - patterns:
+          - pattern-inside: |
+              $RET $METHOD(..., @RequestParam(value=$VALUE) $TYPE $VAR, ...) {
+                ...
+              }
+          - focus-metavariable: $VAR
   pattern-sinks:
     - patterns:
       - pattern-either:
@@ -19,12 +46,15 @@ rules:
         - pattern: new ObjectInputStream($INPUT).readObject()
         - pattern: $DECODER.readObject()
         - pattern: XMLDecoder.readObject()
+        - pattern: $YAML.load($INPUT)
+        - pattern: new Yaml().load($INPUT)
   pattern-sanitizers:
     - pattern: new ValidatingObjectInputStream($INPUT)
     - pattern: $VALIDATOR.validate($INPUT)
+    - pattern: whitelistDeserialize($INPUT)
   metadata:
     cwe: "CWE-502: Deserialization of Untrusted Data"
-    owasp: "A08:2021 - Software and Data Integrity Failures"
+    owasp: "A08:2025 - Software and Data Integrity Failures"
   references:
     - "https://github.com/frohoff/ysoserial"
     - "https://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability"

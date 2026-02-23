@@ -6,18 +6,51 @@ rules:
   languages: [java]
   mode: taint
   pattern-sources:
-    - patterns:
-      - pattern-either:
-        - pattern: $REQ.getParameter($PARAM)
-        - pattern: $REQ.getPathVariable($VAR)
-        - pattern: |
-            @RequestParam $TYPE $VAR
+    - pattern-either:
+      - pattern: $REQ.getParameter($PARAM)
+      - pattern: $REQ.getHeader($HEADER)
+      - pattern: $REQ.getAttribute($ATTR)
+      - pattern: $REQ.getPathVariable($VAR)
+      - pattern: $INPUT.readLine()
+      - pattern: $COOKIE.getValue()
+      - pattern: |
+          @RequestParam $TYPE $VAR
+      - pattern: |
+          @PathVariable $TYPE $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam($VALUE) $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., @RequestParam(value=$VALUE) $TYPE $VAR, ...) {
+              ...
+            }
+        - focus-metavariable: $VAR
+      - patterns:
+        - pattern-inside: |
+            $RET $METHOD(..., $TYPE $VAR, ...) {
+              ...
+            }
+        - pattern: $VAR
+        - focus-metavariable: $VAR
   pattern-sinks:
     - patterns:
       - pattern-either:
-        - pattern: $EM.createQuery($QUERY + $TAINTED + ...)
-        - pattern: $JDBC.queryForList($SQL + $TAINTED + ...)
-        - pattern: $JDBC.execute($SQL + $TAINTED + ...)
+        - pattern: $EM.createQuery($TAINTED)
+        - pattern: $EM.createQuery($TAINTED, ...)
+        - pattern: $JDBC.queryForList($TAINTED)
+        - pattern: $JDBC.queryForList($TAINTED, ...)
+        - pattern: $JDBC.execute($TAINTED)
+        - pattern: $JDBC.query($TAINTED, ...)
   pattern-sanitizers:
     - pattern: $VALIDATOR.validateSQLInput($INPUT)
     - pattern: $WHITELIST.contains($INPUT)
