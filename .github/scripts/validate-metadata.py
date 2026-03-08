@@ -15,10 +15,11 @@ logger.addHandler(handler)
 
 
 class RegistryMetadataValidator(Draft7Validator):
+    category_enum = ["security", "correctness", "best-practice", "maintainability", "portability", "performance", "accessibility"]
     required_property_messages = {
         "references": "Please include at least one URL with more information about this rule in a metadata field called 'references'.",
         "technology": "Please include a metadata field called 'technology' that is a list of relevent tech stacks. For example: [python, flask], or [javascript, jwt].",
-        "category": "Please include a metadata field called 'category' that is one of {self.category_enum}",
+        "category": f"Please include a metadata field called 'category' that is one of {category_enum}",
         "cwe": "Please include a 'cwe' metadata field for security rules. Format: CWE-nnn, where nnn is the CWE number. See https://cwe.mitre.org/ for more info.",
         "likelihood": "Please include a 'likelihood' metadata field for security rules that is one of that is one of ['LOW', 'MEDIUM', 'HIGH'], See https://semgrep.dev/docs/contributing/contributing-to-semgrep-rules-repository for more info.",
         "impact": "Please include a 'impact' metadata field for security rules that is one of that is one of ['LOW', 'MEDIUM', 'HIGH'], See https://semgrep.dev/docs/contributing/contributing-to-semgrep-rules-repository for more info.",
@@ -29,7 +30,7 @@ class RegistryMetadataValidator(Draft7Validator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # self.category_enum = self.schema.get('properties', {}).get('category', {}).get('enum', [])
-        self.category_enum = {}
+        # self.category_enum = {}
 
     def _extend_message(self, error: ValidationError) -> None:
         if error.message.endswith("is a required property"):
